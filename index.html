@@ -269,6 +269,19 @@ function apiMessage(e) {
   return 'Ocorreu um erro inesperado. Tenta novamente.';
 }
 var SERVER_REJECT = { invalid_dates: 'A data desta actividade está fora do intervalo permitido.', invalid_times: 'Os tempos desta actividade são inconsistentes.', invalid_coordinates: 'Os dados do percurso são inválidos.', insufficient_data: 'Não há dados GPS suficientes para validar esta actividade.', invalid_mode: 'A modalidade desta actividade é inválida.' };
+
+/* ---- Partilha: remove o início e o fim do percurso (privacidade) ---- */
+function trimRoute(coords, maxM, frac) {
+  if (!coords || coords.length < 2) return coords || [];
+  var cum = [0], total = 0, i, seg;
+  for (i = 1; i < coords.length; i++) {
+    seg = coords[i][4] ? 0 : haversineM({ lat: coords[i - 1][0], lon: coords[i - 1][1] }, { lat: coords[i][0], lon: coords[i][1] });
+    total += seg; cum.push(total);
+  }
+  if (!(total > 0)) return coords;
+  var t = Math.min(maxM, total * frac);
+  return coords.filter(function (c, idx) { return cum[idx] >= t && cum[idx] <= total - t; });
+}
 /*CORE-END*/
 
 /* ============================================================
@@ -283,7 +296,7 @@ var TERMS = [
   ['Alterações', 'Este texto é um rascunho informativo. Deve ser revisto por um jurista e substituído pelos termos e pela política de privacidade oficiais antes do lançamento público.']
 ];
 var state = { user: null, acts: [], notifs: [], flags: {}, view: 'splash', params: {}, tab: 'home', dbOk: true, run: newRun(), draft: null, choice: { mode: 'run' },
-  hist: { mode: 'all' }, rankTab: 'national', rankProv: 'Luanda', rankReq: 0, myPos: null, maps: {}, leafletPromise: null, uiTimer: null, watchId: null, wakeLock: null,
+  hist: { mode: 'all' }, share: { fmt: 'feed', bg: 'dark', trim: true, photo: null, blob: null }, logoImg: null, rankTab: 'national', rankProv: 'Luanda', rankReq: 0, myPos: null, maps: {}, leafletPromise: null, uiTimer: null, watchId: null, wakeLock: null,
   gpsText: 'Localização inactiva', toastTimer: null, starting: false, saving: false, syncing: false, pendingEmail: '' };
 
 function $(id) { return document.getElementById(id); }
@@ -472,7 +485,7 @@ async function loadCoords(a) {
   if (a.coordsLoading || (a.coordinates && a.coordinates.length)) return; a.coordsLoading = true;
   try {
     var rows = await api('/rest/v1/activities?select=coordinates&client_id=eq.' + encodeURIComponent(a.id));
-    if (rows && rows[0] && rows[0].coordinates) { a.coordinates = rows[0].coordinates; await persist(a); if (state.view === 'detail' && state.params.id === a.id) render(); }
+    if (rows && rows[0] && rows[0].coordinates) { a.coordinates = rows[0].coordinates; await persist(a); if ((state.view === 'detail' || state.view === 'share') && state.params.id === a.id) render(); }
   } catch (e) {} finally { a.coordsLoading = false; }
 }
 async function syncPending() {
@@ -518,7 +531,7 @@ window.addEventListener('offline', function () { $('banner').textContent = 'Sem 
 /* ============================================================
    4. NAVEGAÇÃO
    ============================================================ */
-var AUTH = { splash: 1, welcome: 1, register: 1, login: 1, recover: 1, terms: 1, confirm: 1, newpass: 1 }, MAIN = { home: 'home', runs: 'runs', ranking: 'ranking', profile: 'profile', history: 'runs', detail: 'runs', goals: 'home', edit: 'profile' };
+var AUTH = { splash: 1, welcome: 1, register: 1, login: 1, recover: 1, terms: 1, confirm: 1, newpass: 1 }, MAIN = { home: 'home', runs: 'runs', ranking: 'ranking', profile: 'profile', history: 'runs', detail: 'runs', goals: 'home', edit: 'profile', share: 'runs' };
 var VIEWS = {};
 /* Abertura: o logótipo desenha-se a partir do ponto do topo e percorre o mapa como um corredor.
    O mapa de progresso (PNG em tons de cinzento) diz a que momento cada pixel do logótipo oficial aparece. */
@@ -681,6 +694,7 @@ VIEWS.detail = function () {
     (hasRoute ? '<div id="map-det" class="map"></div><p class="small muted" style="margin-bottom:12px">Percurso gravado pelo GPS.</p>' : '<div class="card center muted small">' + (a.synced ? 'A carregar o percurso…' : 'Sem percurso disponível.') + '</div>') +
     '<div class="card center"><div class="big">' + fmtKm(a.distanceKm) + '<small>km</small></div><div class="muted small">' + fmtDate(a.startTime) + '</div></div>' +
     '<div class="row" style="margin-bottom:14px"><div class="metric"><b>' + fmtDur(a.durationSeconds) + '</b><span>Tempo em movimento</span></div><div class="metric"><b>' + fmtPace(paceOf(a)) + '</b><span>min/km</span></div><div class="metric"><b>' + fmtKmh(a.averageSpeed) + '</b><span>km/h</span></div></div>' +
+    '<button type="button" class="btn btn-neon" data-action="share" data-id="' + esc(a.id) + '" style="margin-bottom:14px">PARTILHAR ACTIVIDADE</button>' +
     '<div class="card"><h3>Validação</h3><p>' + statusTag(a) + '</p>' + (a.status === 'pending' ? '<p class="small muted">Esta actividade ainda não foi validada pelo servidor. Será enviada quando houver ligação.</p>' : a.reasons && a.reasons.length ? '<ul class="rules" style="margin-top:8px">' + a.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="small muted">Sem anomalias detectadas.</p>') +
     (a.status === 'review' ? '<p class="small muted">Os quilómetros ficam fora dos totais e do ranking até haver validação.</p>' : '') + (a.status === 'rejected' ? '<p class="small muted">Esta actividade não conta para os totais válidos.</p>' : '') + '</div><p class="small muted center">As distâncias registadas não podem ser editadas nem apagadas.</p>';
   if (hasRoute) mountMap('map-det', a.coordinates, true);
@@ -756,7 +770,7 @@ async function summaryView() {
     '<div id="map-sum" class="map"></div><p class="small muted" style="margin-bottom:12px">Percurso gravado pelo GPS.</p><div class="card center"><div class="big">' + fmtKm(a.distanceKm) + '<small>km</small></div></div>' +
     '<div class="row" style="margin-bottom:14px"><div class="metric"><b>' + fmtDur(a.durationSeconds) + '</b><span>Tempo</span></div><div class="metric"><b>' + fmtPace(paceOf(a)) + '</b><span>min/km</span></div><div class="metric"><b>' + fmtKmh(a.averageSpeed) + '</b><span>km/h</span></div></div>' +
     '<div class="card"><h3>Validação preliminar</h3><p>' + tag + '</p>' + (a.reasons.length ? '<ul class="rules" style="margin-top:8px">' + a.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="small muted">Sem anomalias. A validação final é feita pelo servidor ao guardares.' + (a.mode === 'run' ? ' Se for válida, os quilómetros contam para o ranking.' : ' A caminhada é de acompanhamento pessoal.') + '</p>') + '</div>' +
-    (a.canSave ? '<button type="button" id="save-btn" class="btn btn-neon" data-action="save">GUARDAR ACTIVIDADE</button>' : '') + '<button type="button" class="btn btn-danger" data-action="discard" style="margin-top:10px">DESCARTAR</button>';
+    (a.canSave ? '<button type="button" id="save-btn" class="btn btn-neon" data-action="save">GUARDAR ACTIVIDADE</button><button type="button" class="btn btn-ghost" data-action="share" data-draft="1" style="margin-top:10px">PARTILHAR</button>' : '') + '<button type="button" class="btn btn-danger" data-action="discard" style="margin-top:10px">DESCARTAR</button>';
   mountMap('map-sum', a.coordinates, true);
 }
 async function saveRun() {
@@ -857,6 +871,93 @@ function sendFeedback() {
   toast('Envia-nos a tua opinião por mensagem.', true);
 }
 
+
+/* ---- Partilhar actividade: imagem com estatísticas e o traçado do percurso ---- */
+function shareActivity() { var P = state.params; return P.draft ? state.draft : state.acts.filter(function (x) { return x.id === P.id; })[0]; }
+VIEWS.share = function () {
+  var P = state.params, a = shareActivity(); if (!a) { go('runs'); return; }
+  if (!P.draft && a.synced && !(a.coordinates && a.coordinates.length)) loadCoords(a);
+  var S = state.share;
+  function chip(act, key, val, label, cur) { return '<button type="button" class="chip' + (cur === val ? ' on' : '') + '" data-action="' + act + '" data-' + key + '="' + val + '">' + label + '</button>'; }
+  $('view').innerHTML = '<button type="button" class="btn-link" data-action="share-back">‹ Voltar</button><h1 style="margin:8px 0 12px">Partilhar</h1>' +
+    '<canvas id="share-canvas" role="img" aria-label="Pré-visualização da imagem para partilhar" style="width:100%;height:auto;border-radius:16px;border:1px solid #252D27;background:#080A08"></canvas>' +
+    '<h3 style="margin:16px 0 6px">Formato</h3><div class="chips">' + chip('share-fmt', 'f', 'feed', 'Feed (4:5)', S.fmt) + chip('share-fmt', 'f', 'story', 'Story (9:16)', S.fmt) + '</div>' +
+    '<h3 style="margin:6px 0 6px">Fundo</h3><div class="chips">' + chip('share-bg', 'b', 'dark', 'Escuro KORRE', S.bg) + chip('share-bg', 'b', 'photo', S.photo ? 'Trocar foto' : 'Usar uma foto', S.bg) + '</div>' +
+    '<input type="file" id="share-file" accept="image/*" hidden>' +
+    '<div class="card"><div class="switch"><span>Esconder início e fim do percurso<br><span class="small muted">Por privacidade, não mostramos os primeiros e últimos metros (por exemplo, a tua casa).</span></span><button type="button" class="' + (S.trim ? 'on' : '') + '" data-action="share-trim" aria-pressed="' + !!S.trim + '" aria-label="Esconder início e fim do percurso"></button></div></div>' +
+    '<button type="button" class="btn btn-neon btn-xl" data-action="share-do">PARTILHAR</button><button type="button" class="btn btn-ghost" data-action="share-save" style="margin-top:10px">Guardar imagem</button>';
+  drawShare(a);
+};
+function drawShare(a) {
+  var cv = $('share-canvas'); if (!cv) return; var S = state.share; S.blob = null;
+  drawShareImage(cv, a, S);
+  cv.toBlob(function (b) { S.blob = b; }, 'image/png');
+}
+function drawShareImage(cv, a, o) {
+  var W = 1080, H = o.fmt === 'story' ? 1920 : 1350, k = H / 1350, c, i, FONT = '-apple-system, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif';
+  cv.width = W; cv.height = H; c = cv.getContext('2d');
+  var g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0d140d'); g.addColorStop(1, '#040504'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  if (o.bg === 'photo' && o.photo) {
+    var iw = o.photo.naturalWidth || o.photo.width, ih = o.photo.naturalHeight || o.photo.height, sc = Math.max(W / iw, H / ih);
+    c.drawImage(o.photo, (W - iw * sc) / 2, (H - ih * sc) / 2, iw * sc, ih * sc); c.fillStyle = 'rgba(0,0,0,0.58)'; c.fillRect(0, 0, W, H);
+  } else { var rg = c.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, W * 0.8); rg.addColorStop(0, 'rgba(57,255,105,0.10)'); rg.addColorStop(1, 'rgba(57,255,105,0)'); c.fillStyle = rg; c.fillRect(0, 0, W, H); }
+  c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+  function text(str, x, y, size, color, weight) { c.save(); c.font = (weight || 800) + ' ' + size + 'px ' + FONT; c.fillStyle = color; c.shadowColor = 'rgba(0,0,0,0.65)'; c.shadowBlur = 14; c.fillText(str, x, y); c.restore(); }
+  var d = new Date(a.startTime);
+  text(MODES[a.mode] + ' · ' + pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1), W / 2, 150 * k, 46, '#d7ded8', 600);
+  // percurso
+  var bx = 130, by = 215 * k, bw = W - 260, bh = 560 * k, coords = a.coordinates || [], route = o.trim ? trimRoute(coords, 200, 0.1) : coords, segs = segments(route), pts = [];
+  segs.forEach(function (sg) { pts = pts.concat(sg); });
+  if (pts.length > 1) {
+    var la = pts.map(function (p) { return p[0]; }), lo = pts.map(function (p) { return p[1]; });
+    var minLa = Math.min.apply(null, la), maxLa = Math.max.apply(null, la), minLo = Math.min.apply(null, lo), maxLo = Math.max.apply(null, lo);
+    var cl = Math.cos(toRad((minLa + maxLa) / 2)), rw = (maxLo - minLo) * cl || 1e-6, rh = (maxLa - minLa) || 1e-6, sc2 = Math.min(bw / rw, bh / rh) * 0.92;
+    var ox = bx + (bw - rw * sc2) / 2, oy = by + (bh - rh * sc2) / 2;
+    var P2 = function (p) { return [ox + (p[1] - minLo) * cl * sc2, oy + (maxLa - p[0]) * sc2]; };
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    c.save(); c.strokeStyle = '#39FF69'; c.lineWidth = 13; c.shadowColor = '#39FF69'; c.shadowBlur = 34;
+    segs.forEach(function (sg) { c.beginPath(); sg.forEach(function (p, i2) { var q = P2(p); i2 ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); }); c.stroke(); }); c.restore();
+    c.save(); c.strokeStyle = '#E6FFEA'; c.lineWidth = 4;
+    segs.forEach(function (sg) { c.beginPath(); sg.forEach(function (p, i2) { var q = P2(p); i2 ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); }); c.stroke(); }); c.restore();
+    var s0 = P2(pts[0]), e0 = P2(pts[pts.length - 1]);
+    c.save(); c.shadowColor = '#39FF69'; c.shadowBlur = 20; c.fillStyle = '#39FF69'; c.beginPath(); c.arc(s0[0], s0[1], 17, 0, 6.2832); c.fill();
+    c.fillStyle = '#ffffff'; c.beginPath(); c.arc(e0[0], e0[1], 17, 0, 6.2832); c.fill(); c.lineWidth = 6; c.strokeStyle = '#39FF69'; c.stroke(); c.restore();
+  } else if (state.logoImg && state.logoImg.complete) {
+    c.save(); c.globalCompositeOperation = 'screen'; c.globalAlpha = 0.9; c.drawImage(state.logoImg, W / 2 - 230, by + bh / 2 - 230, 460, 460); c.restore();
+  }
+  // estatísticas
+  var pace = paceOf(a);
+  text(fmtKm(a.distanceKm), W / 2, 925 * k, 190, '#ffffff', 800); text('Distância (km)', W / 2, 980 * k, 36, '#c4ccc6', 500);
+  text(fmtDur(a.durationSeconds), W * 0.3, 1095 * k, 84, '#ffffff', 800); text('Duração', W * 0.3, 1142 * k, 32, '#c4ccc6', 500);
+  text(fmtPace(pace), W * 0.7, 1095 * k, 84, '#ffffff', 800); text('Ritmo (min/km)', W * 0.7, 1142 * k, 32, '#c4ccc6', 500);
+  // rodapé: logótipo e nome lado a lado
+  var fy = H - 92 * k;
+  if (state.logoImg && state.logoImg.complete) { c.save(); c.globalCompositeOperation = 'screen'; c.drawImage(state.logoImg, W / 2 - 170, fy - 46, 92, 92); c.restore(); }
+  c.save(); c.textAlign = 'left'; try { c.letterSpacing = '8px'; } catch (e) {} c.font = '800 44px ' + FONT; c.fillStyle = '#e9efe9'; c.shadowColor = 'rgba(0,0,0,0.65)'; c.shadowBlur = 14; c.fillText('KORRE', W / 2 - 60, fy + 15); c.restore();
+}
+function saveBlob(blob, name) {
+  var url = URL.createObjectURL(blob), l = document.createElement('a'); l.href = url; l.download = name; document.body.appendChild(l); l.click(); l.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 5000); toast('Imagem guardada.');
+}
+function withShareBlob(fn) {
+  var S = state.share, a = shareActivity(); if (!a) return;
+  var name = 'korre-' + (a.mode === 'run' ? 'corrida' : 'caminhada') + '.png';
+  if (S.blob) return fn(S.blob, name);
+  var cv = $('share-canvas'); if (!cv) return; cv.toBlob(function (b) { S.blob = b; if (b) fn(b, name); else toast('Não foi possível criar a imagem.', true); }, 'image/png');
+}
+function doShare() {
+  withShareBlob(function (blob, name) {
+    var file; try { file = new File([blob], name, { type: 'image/png' }); } catch (e) { saveBlob(blob, name); return; }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], text: 'A minha actividade na KORRE' }).catch(function (e) { if (!e || e.name !== 'AbortError') saveBlob(blob, name); }); }
+    else saveBlob(blob, name);
+  });
+}
+function loadSharePhoto(file) {
+  if (!file) return; var url = URL.createObjectURL(file), img = new Image();
+  img.onload = function () { state.share.photo = img; state.share.bg = 'photo'; render(); };
+  img.onerror = function () { toast('Não foi possível abrir essa foto.', true); }; img.src = url;
+}
+
 /* ============================================================
    5. AÇÕES
    ============================================================ */
@@ -888,6 +989,13 @@ async function onAction(act, el) {
     case 'bell': openBell(); render(); break;
     case 'close-sheet': $('sheet').hidden = true; render(); break;
     case 'feedback': sendFeedback(); break;
+    case 'share': go('share', { id: el.getAttribute('data-id'), draft: el.getAttribute('data-draft') === '1' }); break;
+    case 'share-back': if (state.params.draft) go('active'); else go('detail', { id: state.params.id }); break;
+    case 'share-fmt': state.share.fmt = el.getAttribute('data-f'); render(); break;
+    case 'share-bg': if (el.getAttribute('data-b') === 'photo') $('share-file').click(); else { state.share.bg = 'dark'; render(); } break;
+    case 'share-trim': state.share.trim = !state.share.trim; render(); break;
+    case 'share-do': doShare(); break;
+    case 'share-save': withShareBlob(saveBlob); break;
     case 'logout':
       if (state.run.status !== 'idle') { toast('Termina a actividade em curso primeiro.', true); break; }
       await syncPending();
@@ -911,7 +1019,7 @@ document.addEventListener('submit', function (e) {
     patchProfile({ display_name: name, ranking_name: rn || null, province: $('p-prov').value, sex: $('p-sex').value, sex_public: !$('p-priv').checked }).then(function () { toast('Perfil actualizado.'); go('profile'); }, function (x) { toast(apiMessage(x), true); busyBtn('p-go', false, 'GUARDAR'); });
   }
 });
-document.addEventListener('change', function (e) { if (e.target.id === 'rank-prov') { state.rankProv = e.target.value; render(); } });
+document.addEventListener('change', function (e) { if (e.target.id === 'rank-prov') { state.rankProv = e.target.value; render(); } if (e.target.id === 'share-file') loadSharePhoto(e.target.files && e.target.files[0]); });
 document.addEventListener('visibilitychange', function () { var r = state.run; if (document.visibilityState === 'visible' && r.status === 'running') { requestWake(); toast('A app esteve em segundo plano: pode haver lacunas no percurso.'); } });
 window.addEventListener('unhandledrejection', function (e) { if (e.preventDefault) e.preventDefault(); toast('Ocorreu um erro inesperado. Tenta novamente.', true); });
 
@@ -923,6 +1031,7 @@ async function init() {
   var m = document.createElement('link'); m.rel = 'manifest';
   m.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ name: 'KORRE', short_name: 'KORRE', start_url: location.origin + location.pathname, display: 'standalone', background_color: '#080A08', theme_color: '#080A08', icons: [{ src: LOGO, sizes: '256x256', type: 'image/png' }] })); document.head.appendChild(m);
   $('tabs').innerHTML = [['home', 'Início', 'home'], ['runs', 'Corridas', 'runs'], ['ranking', 'Ranking', 'rank'], ['profile', 'Perfil', 'profile']].map(function (t) { return '<button type="button" data-action="nav" data-view="' + t[0] + '" data-tab="' + t[0] + '" aria-label="' + t[1] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('');
+  state.logoImg = new Image(); state.logoImg.src = LOGO;
   go('splash'); var sp = splashDone;
   document.addEventListener('click', function () { if (state.view === 'splash' && splashSkip) splashSkip(); });
   state.dbOk = await Store.open();
