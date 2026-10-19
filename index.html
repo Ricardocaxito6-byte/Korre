@@ -4,64 +4,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>KORRE</title>
-<meta name="theme-color" content="#080A08">
+<meta name="theme-color" content="#0A0C0A">
 <meta name="description" content="KORRE: corrida e caminhada com ranking, feita para Angola.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KORRE">
-<style>
-:root{--bg:#080A08;--card:#111511;--neon:#39FF69;--green:#19C75A;--text:#F5F7F5;--muted:#A0AAA2;--line:#252D27;--amber:#FFB938;--red:#FF5A5F}
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>:root{--bg:#0A0C0A;--s1:#111511;--s2:#171C18;--line:#1F2822;--text:#F2F5F2;--muted:#8D998F;--neon:#39FF69;--green:#19C75A;--amber:#FFB938;--red:#FF5A5F;
+ --fh:"Barlow Condensed","Avenir Next Condensed","HelveticaNeue-CondensedBold","Arial Narrow","DejaVu Sans Condensed",sans-serif;
+ --fb:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.35;overflow-x:hidden;overscroll-behavior-y:none}
-#view{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(100px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-#view.notabs{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
-h1{font-size:30px;font-weight:900;line-height:1.1;letter-spacing:-.5px}h2{font-size:22px;font-weight:900;margin-bottom:10px}h3{font-size:16px;font-weight:800;margin-bottom:6px}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.45;overflow-x:hidden;overscroll-behavior-y:none;-webkit-font-smoothing:antialiased}
+#view{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) max(20px,env(safe-area-inset-right,0px)) calc(104px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+#view.notabs{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
+h1{font-family:var(--fh);font-size:40px;font-weight:700;line-height:1;letter-spacing:.01em;text-transform:uppercase}
+h2{font-family:var(--fh);font-size:26px;font-weight:700;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px}
+h3{font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .muted{color:var(--muted)}.small{font-size:13px}.neon{color:var(--neon)}.center{text-align:center}
+.sect{font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:26px 0 6px}
 .logo{mix-blend-mode:screen;display:block;flex:none}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.who{display:flex;align-items:center;gap:10px;min-width:0}.who b{font-size:18px;overflow-wrap:anywhere}
-.iconbtn{position:relative;width:48px;height:48px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none}
-.dotbadge{position:absolute;top:5px;right:5px;min-width:18px;height:18px;border-radius:9px;background:var(--neon);color:#000;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 4px}
-.card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.wordmark{font-family:var(--fh);font-size:24px;font-weight:700;letter-spacing:.22em;text-indent:.1em}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.who{display:flex;align-items:center;gap:10px;min-width:0}
+.iconbtn{position:relative;width:44px;height:44px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none}
+.dotbadge{position:absolute;top:2px;right:2px;min-width:17px;height:17px;border-radius:9px;background:var(--neon);color:#04110a;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
 .row{display:flex;gap:10px}.row>*{flex:1;min-width:0}.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border-radius:16px;border:0;font-size:16px;font-weight:900;padding:0 16px;letter-spacing:.3px;color:var(--text)}
-.btn-neon{background:var(--neon);color:#031006;box-shadow:0 0 22px rgba(57,255,105,.25)}.btn-xl{min-height:72px;font-size:20px;border-radius:22px}
-.btn-ghost{background:transparent;border:2px solid #34403a}.btn-danger{background:transparent;color:var(--red);border:2px solid var(--red)}.btn-dark{background:#1d231f}
-.btn:active{transform:scale(.98)}.btn[disabled]{opacity:.5}
-.btn-link{background:none;border:0;color:var(--neon);font-weight:800;font-size:15px;min-height:44px;padding:0 4px;text-decoration:underline}
-.metric{background:var(--card);border-radius:16px;padding:12px 8px;text-align:center;border:1px solid var(--line)}.metric b{display:block;white-space:nowrap;font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}.metric span{font-size:12px;color:var(--muted)}
-.big{font-size:62px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px}.big small{font-size:20px;font-weight:700;color:var(--muted);margin-left:4px}
-.bar{height:12px;border-radius:6px;background:#1f2621;overflow:hidden;margin:8px 0 6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--neon));border-radius:6px}
-.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}.chip{flex:none;min-height:44px;padding:0 16px;border-radius:22px;background:var(--card);color:var(--text);border:1px solid var(--line);font-weight:700;font-size:14px}.chip.on{background:var(--neon);color:#031006;border-color:var(--neon)}
-label.f{display:block;font-weight:800;font-size:14px;margin:12px 0 6px}
-select,input[type=text],input[type=email],input[type=password],input[type=number]{width:100%;height:50px;border-radius:14px;border:2px solid #2f3a33;background:#0c100d;color:var(--text);font-size:16px;padding:0 14px;-webkit-appearance:none;appearance:none}
-input:focus,select:focus{outline:3px solid rgba(57,255,105,.4);border-color:var(--neon)}
-.ferr{color:var(--red);font-size:13px;font-weight:700;margin-top:4px}
-.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:12px 0}.chk input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:#39FF69}
-.act{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;color:var(--text)}
-.act .mi{flex:none;width:44px;height:44px;border-radius:12px;background:#0c100d;display:flex;align-items:center;justify-content:center;color:var(--neon)}.act .t{min-width:0;flex:1}.act b{font-size:18px}
-.tag{display:inline-block;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;margin:2px 4px 2px 0;letter-spacing:.3px}
-.tag.ok{background:rgba(57,255,105,.14);color:var(--neon)}.tag.rev{background:rgba(255,185,56,.15);color:var(--amber)}.tag.rej{background:rgba(255,90,95,.15);color:var(--red)}.tag.demo{background:#F5F7F5;color:#000}
-.mode{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;color:var(--text)}.mode.on{border-color:var(--neon);box-shadow:0 0 18px rgba(57,255,105,.2)}
-.mode .mi{flex:none;width:56px;height:56px;border-radius:16px;background:#0c100d;display:flex;align-items:center;justify-content:center;color:var(--neon)}
-.map{height:250px;border-radius:18px;overflow:hidden;margin-bottom:8px;background:#0c100d;border:1px solid var(--line)}.nomap{display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:16px;color:var(--muted);font-size:14px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border-radius:12px;border:0;font-family:var(--fh);font-size:19px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:0 16px;color:var(--text)}
+.btn-neon{background:var(--neon);color:#04110a}.btn-xl{min-height:64px;font-size:24px;border-radius:14px}
+.btn-ghost{background:transparent;border:1.5px solid #2B372E}.btn-danger{background:transparent;color:var(--red);border:1.5px solid rgba(255,90,95,.6)}.btn-dark{background:var(--s2)}
+.btn:active{opacity:.85}.btn[disabled]{opacity:.5}
+.btn-link{background:none;border:0;color:var(--neon);font-family:var(--fb);font-weight:600;font-size:14px;min-height:44px;padding:0 2px}
+.metric{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 12px 10px;text-align:left}
+.metric b{display:block;font-family:var(--fh);font-size:30px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.metric span{display:block;line-height:1.25;margin-top:2px;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stats{display:flex;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:20px 0 20px}
+.stats .metric{flex:1;min-width:0;background:none;border:0;border-left:1px solid var(--line);border-radius:0;padding:14px 4px 12px 14px}.stats .metric:first-child{border-left:0;padding-left:0}
+.big{font-family:var(--fh);font-weight:700;font-size:96px;line-height:.9;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.big small{font-family:var(--fb);font-size:16px;font-weight:600;color:var(--muted);margin-left:8px;letter-spacing:.04em}
+.bar{height:6px;border-radius:3px;background:#1B231D;overflow:hidden;margin:8px 0 6px}.bar i{display:block;height:100%;background:var(--neon);border-radius:3px;transition:width .4s}
+.goal{margin:14px 0}.gl{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}.gl b{font-family:var(--fh);font-size:22px;font-weight:700}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}.chip{flex:none;min-height:40px;padding:0 13px;border-radius:999px;background:transparent;color:var(--text);border:1px solid #2B372E;font-weight:600;font-size:13px}.chip.on{background:var(--neon);color:#04110a;border-color:var(--neon)}
+label.f{display:block;font-weight:600;font-size:13px;letter-spacing:.02em;margin:14px 0 6px;color:#cdd5cf}
+select,input[type=text],input[type=email],input[type=password],input[type=number]{width:100%;height:50px;border-radius:12px;border:1px solid #26312A;background:var(--s1);color:var(--text);font-family:var(--fb);font-size:16px;padding:0 14px;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{outline:2px solid rgba(57,255,105,.35);border-color:var(--neon)}
+.ferr{color:var(--red);font-size:13px;font-weight:600;margin-top:4px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:14px 0}.chk input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:#39FF69}
+.li{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--text);font-family:var(--fb);font-size:16px;text-align:left;padding:8px 2px}
+.li .small{line-height:1.3}.li .chev{color:var(--muted);font-size:22px;line-height:1}.li.danger{color:var(--red)}
+.act{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:14px 2px;margin:0;color:var(--text)}
+.act .mi{flex:none;width:42px;height:42px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--neon)}.act .t{min-width:0;flex:1}.act b{font-family:var(--fh);font-size:26px;font-weight:700;letter-spacing:.01em}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;margin:3px 5px 0 0;letter-spacing:.09em}
+.tag.ok{background:rgba(57,255,105,.12);color:var(--neon)}.tag.rev{background:rgba(255,185,56,.14);color:var(--amber)}.tag.rej{background:rgba(255,90,95,.14);color:var(--red)}.tag.demo{background:#F2F5F2;color:#000}
+.mode{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;color:var(--text)}.mode.on{border-color:var(--neon)}
+.mode .mi{flex:none;width:54px;height:54px;border-radius:12px;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--neon)}
+.mode b{font-family:var(--fh);font-size:26px;letter-spacing:.05em}
+.map{height:250px;border-radius:14px;overflow:hidden;margin-bottom:8px;background:#0c100d;border:1px solid var(--line)}.nomap{display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:16px;color:var(--muted);font-size:14px}
 .leaflet-container{background:#0c100d;font-family:inherit}.pin{width:16px;height:16px;border-radius:50%;border:3px solid #000}
-#tabs{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(8,10,8,.96);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:30;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-#tabs button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:54px;font-size:11px;font-weight:700}#tabs button.on{color:var(--neon)}
-#demo-strip{background:#F5F7F5;color:#000;font-weight:900;font-size:13px;padding:calc(env(safe-area-inset-top,0px) + 6px) 12px 6px;text-align:center}
-#banner{background:#2a1d00;color:var(--amber);padding:10px 14px;font-size:14px;font-weight:700;text-align:center}
-.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;justify-content:center}.sheet{background:#0f130f;width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));border:1px solid var(--line)}
+#tabs{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(10,12,10,.96);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:30;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#tabs button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:54px;font-family:var(--fb);font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}#tabs button.on{color:var(--neon)}
+#banner{background:#241a08;color:var(--amber);padding:10px 14px;font-size:13px;font-weight:600;text-align:center}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;justify-content:center}.sheet{background:#0f130f;width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));border:1px solid var(--line)}
 .notif{padding:12px 0;border-bottom:1px solid var(--line)}.notif.unread b{color:var(--neon)}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:92vw;background:#F5F7F5;color:#000;padding:12px 16px;border-radius:14px;font-weight:800;font-size:15px;z-index:60}#toast.err{background:var(--red);color:#fff}
-.rank{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}.rank .pos{width:44px;font-weight:900;font-variant-numeric:tabular-nums}.rank .nm{flex:1;min-width:0;overflow-wrap:anywhere}.rank.me{background:rgba(57,255,105,.1);border-radius:12px;border-bottom-color:transparent}.rank .km{font-weight:900;font-variant-numeric:tabular-nums}
-.avatar{width:72px;height:72px;border-radius:50%;color:#031006;font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
-.rules li{margin:0 0 8px 18px;font-size:14px;color:#d4dad6}.chart text{fill:#A0AAA2;font-size:10px}.chart .v{fill:#F5F7F5;font-weight:700}
-.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}.switch button{width:58px;height:32px;border-radius:16px;border:0;background:#2a332d;position:relative;flex:none}.switch button::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .2s}.switch button.on{background:var(--neon)}.switch button.on::after{left:29px;background:#031006}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.splash{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
-@media (max-width:350px){.big{font-size:50px}h1{font-size:25px}}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));width:max-content;max-width:90vw;background:var(--s2);color:var(--text);padding:12px 16px;border-radius:10px;border:1px solid var(--line);border-left:3px solid var(--neon);font-weight:500;font-size:14px;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.5)}#toast.err{border-left-color:var(--red)}
+.rank{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}.rank .pos{width:46px;font-family:var(--fh);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}.rank .nm{flex:1;min-width:0;overflow-wrap:anywhere}.rank.me{background:rgba(57,255,105,.08);border-radius:10px;border-bottom-color:transparent}.rank .km{font-family:var(--fh);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.avatar{width:64px;height:64px;border-radius:50%;color:#04110a;font-family:var(--fh);font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.rules li{margin:0 0 8px 18px;font-size:14px;color:#d4dad6}.chart text{fill:#8D998F;font-size:10px}.chart .v{fill:#F2F5F2;font-weight:600}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}.switch button{width:52px;height:30px;border-radius:15px;border:0;background:#26302A;position:relative;flex:none}.switch button::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}.switch button.on{background:var(--neon)}.switch button.on::after{left:25px;background:#04110a}
+.splash{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.splash h1{letter-spacing:.3em;text-indent:.15em;font-size:44px}
+@media (max-width:350px){.big{font-size:76px}h1{font-size:32px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -663,16 +678,18 @@ async function onNewPass() {
 VIEWS.home = function () {
   var u = state.user, ref = new Date(), st = computeStats(state.acts, ref), n = unread(), r = state.run, live = r.status === 'running' || r.status === 'paused' || r.status === 'finished';
   var recent = state.acts.slice().sort(function (a, b) { return b.startTime - a.startTime; }).slice(0, 3), pend = state.acts.filter(function (a) { return !a.synced && !a.localOnly; }).length;
-  function goalCard(m) { var g = goalProgress(state.acts, u.goals[m], m, ref); return '<div class="card" style="margin-bottom:10px"><div class="between"><h3>Meta mensal de ' + MODES[m].toLowerCase() + ': ' + g.goal + ' km</h3><b class="neon">' + g.pct + '%</b></div><div class="bar"><i style="width:' + g.pct + '%"></i></div><p class="small">' + fmtKm1(g.km) + ' km válidos · ' + (g.reached ? 'meta atingida' : 'faltam ' + fmtKm1(g.remaining) + ' km') + '</p></div>'; }
-  var rankCard = '<div class="card"><h3>Ranking</h3>' + (!u.showInRanking ? '<p class="small muted">Ainda não estás no ranking. Activa-o quando quiseres.</p>' : state.myPos ? '<p style="margin:6px 0"><b class="neon" style="font-size:26px">' + state.myPos.pos + '.º</b> <span class="small muted">· ' + fmtKm1(state.myPos.km) + ' km válidos de corrida</span></p>' : '<p class="small muted">Faz a tua primeira corrida válida para entrares na classificação.</p>') +
-    '<button type="button" class="btn btn-ghost" data-action="nav" data-view="ranking" style="margin-top:8px">Ver ranking</button></div>';
-  $('view').innerHTML = '<div class="top"><div class="who">' + logoImg(46) + '<div><div class="small muted">Olá,</div><b>' + esc(u.name) + '</b></div></div><button type="button" class="iconbtn" data-action="bell" aria-label="Notificações">' + icon('bell') + (n ? '<span class="dotbadge">' + n + '</span>' : '') + '</button></div>' +
-    (pend ? '<div class="card" style="border-color:#FFB938"><div class="between"><span class="small">' + pend + ' actividade(s) por validar</span><button type="button" class="btn-link" data-action="sync-now">Sincronizar</button></div></div>' : '') +
-    '<div class="card"><div class="small muted">Quilómetros de corrida (válidos)</div><div class="big neon">' + fmtKm1(st.run.km) + '<small>km</small></div><p class="small muted">Caminhada, em separado: ' + fmtKm1(st.walk.km) + ' km</p></div>' +
-    '<div class="row" style="margin-bottom:14px"><div class="metric"><b>' + fmtKm1(st.run.weekKm) + '</b><span>Corrida · semana</span></div><div class="metric"><b>' + fmtKm1(st.walk.weekKm) + '</b><span>Caminhada · semana</span></div><div class="metric"><b>' + fmtMin(st.run.sec + st.walk.sec) + '</b><span>Tempo total</span></div></div>' +
-    (live ? '<button type="button" class="btn btn-ghost" data-action="nav" data-view="active" style="margin-bottom:12px">' + (r.status === 'finished' ? 'Actividade por guardar — abrir resumo' : 'Actividade em curso — voltar') + '</button>' : '') +
-    '<button type="button" class="btn btn-neon btn-xl" data-action="nav" data-view="choose" style="margin-bottom:16px">INICIAR ACTIVIDADE</button>' + goalCard('run') + goalCard('walk') + '<button type="button" class="btn-link" data-action="nav" data-view="goals">Gerir metas</button>' + '<div style="height:8px"></div>' + rankCard +
-    '<div class="between" style="margin:6px 0 8px"><h2 style="margin:0">Actividades recentes</h2><button type="button" class="btn-link" data-action="nav" data-view="runs">Ver todas</button></div>' + (recent.length ? recent.map(actRow).join('') : '<div class="card center muted">Ainda não tens actividades. Toca em INICIAR ACTIVIDADE.</div>') +
+  function goalRow(m) { var g = goalProgress(state.acts, u.goals[m], m, ref); return '<div class="goal"><div class="gl"><span>' + MODES[m] + '</span><span><b>' + fmtKm1(g.km) + '</b> <span class="muted">/ ' + g.goal + ' km</span></span></div><div class="bar"><i style="width:' + g.pct + '%"></i></div><div class="small muted">' + (g.reached ? 'Meta atingida' : 'Faltam ' + fmtKm1(g.remaining) + ' km · ' + g.pct + '%') + '</div></div>'; }
+  var rankTxt = !u.showInRanking ? 'Ainda não estás no ranking' : state.myPos ? '<b style="font-family:var(--fh);font-size:24px">' + state.myPos.pos + '.º</b> <span class="muted">· ' + fmtKm1(state.myPos.km) + ' km válidos de corrida</span>' : 'Faz a tua primeira corrida válida';
+  $('view').innerHTML = '<div class="top"><div class="who">' + logoImg(38) + '<span class="wordmark">KORRE</span></div><button type="button" class="iconbtn" data-action="bell" aria-label="Notificações">' + icon('bell', 22) + (n ? '<span class="dotbadge">' + n + '</span>' : '') + '</button></div>' +
+    '<p class="muted" style="margin:0 0 20px">Olá, <b style="color:var(--text);font-weight:600">' + esc(u.name) + '</b></p>' +
+    (pend ? '<div class="li" style="color:var(--amber);min-height:48px"><span class="small">' + pend + ' actividade(s) por validar</span><button type="button" class="btn-link" data-action="sync-now" style="color:var(--amber)">Sincronizar</button></div>' : '') +
+    '<div class="sect" style="margin-top:6px">Corrida · total válido</div><div class="big neon">' + fmtKm1(st.run.km) + '<small>km</small></div><div class="small muted" style="margin-top:10px">Caminhada: ' + fmtKm1(st.walk.km) + ' km</div>' +
+    '<div class="stats"><div class="metric"><b>' + fmtKm1(st.run.weekKm) + '</b><span>Corrida · semana</span></div><div class="metric"><b>' + fmtKm1(st.walk.weekKm) + '</b><span>Caminhada · semana</span></div><div class="metric"><b>' + fmtMin(st.run.sec + st.walk.sec) + '</b><span>Tempo total</span></div></div>' +
+    (live ? '<button type="button" class="btn btn-ghost" data-action="nav" data-view="active" style="margin-bottom:12px">' + (r.status === 'finished' ? 'Actividade por guardar — resumo' : 'Actividade em curso — voltar') + '</button>' : '') +
+    '<button type="button" class="btn btn-neon btn-xl" data-action="nav" data-view="choose">INICIAR ACTIVIDADE</button>' +
+    '<div class="sect">Metas do mês</div>' + goalRow('run') + goalRow('walk') + '<button type="button" class="btn-link" data-action="nav" data-view="goals">Gerir metas ›</button>' +
+    '<div class="sect">Ranking</div><button type="button" class="li" data-action="nav" data-view="ranking"><span>' + rankTxt + '</span><span class="chev">›</span></button>' +
+    '<div class="sect">Actividades recentes</div>' + (recent.length ? recent.map(actRow).join('') + '<button type="button" class="btn-link" data-action="nav" data-view="runs">Ver todas ›</button>' : '<p class="muted small" style="padding:8px 0">Ainda não tens actividades. Toca em INICIAR ACTIVIDADE.</p>') +
     (state.dbOk ? '' : '<p class="small muted center">Armazenamento do navegador indisponível: as actividades por enviar perdem-se se fechares a página.</p>');
 };
 function actRow(a) {
@@ -831,19 +848,19 @@ VIEWS.goals = function () {
 /* ---- Perfil, edição e notificações ---- */
 VIEWS.profile = function () {
   var u = state.user, ref = new Date(), st = computeStats(state.acts, ref), wr = weeklySeries(state.acts, 'run', ref, 8), ww = weeklySeries(state.acts, 'walk', ref, 8), sexL = { M: 'Masculino', F: 'Feminino', N: 'Não indicado' }[u.sex];
-  $('view').innerHTML = '<h1 style="margin-bottom:14px">Perfil</h1><div class="card"><div class="row" style="align-items:center"><div class="avatar" style="background:' + esc(u.avatar) + ';flex:none">' + esc(u.name.charAt(0).toUpperCase()) + '</div><div><b style="font-size:20px">' + esc(u.name) + '</b><div class="small muted">' + esc(u.athleteId) + ' · ' + esc(u.province) + '</div><div class="small muted">Na KORRE desde ' + new Date(u.createdAt).toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' }) + '</div></div></div></div>' +
-    '<div class="row" style="margin-bottom:10px"><div class="metric"><b>' + fmtKm1(st.run.km) + '</b><span>Km de corrida</span></div><div class="metric"><b>' + fmtKm1(st.walk.km) + '</b><span>Km de caminhada</span></div></div>' +
-    '<div class="row" style="margin-bottom:10px"><div class="metric"><b>' + st.run.count + '</b><span>Corridas</span></div><div class="metric"><b>' + st.walk.count + '</b><span>Caminhadas</span></div></div>' +
-    '<div class="card"><div class="between"><span>Posição no ranking</span><b>' + (u.showInRanking && state.myPos ? state.myPos.pos + '.º' : '—') + '</b></div><div class="between" style="margin-top:6px"><span>Metas mensais</span><b>' + u.goals.run + ' km corrida · ' + u.goals.walk + ' km caminhada</b></div><div class="small muted" style="margin-top:6px">Sexo: ' + sexL + (u.sexPublic === false ? ' (não público)' : '') + '</div></div>' +
-    (st.review.count || st.rejected || st.pending.count ? '<div class="card"><h3>Fora dos totais válidos</h3><p class="small muted">' + (st.pending.count ? st.pending.count + ' por validar. ' : '') + (st.review.count ? st.review.count + ' sob análise (' + fmtKm1(st.review.km) + ' km). ' : '') + (st.rejected ? st.rejected + ' rejeitada(s).' : '') + '</p></div>' : '') +
-    '<div class="card"><div class="switch"><span>Aparecer no ranking<br><span class="small muted">Só mostramos o teu nome de ranking e os km válidos de corrida</span></span><button type="button" class="' + (u.showInRanking ? 'on' : '') + '" data-action="toggle-ranking" aria-pressed="' + !!u.showInRanking + '" aria-label="Aparecer no ranking"></button></div></div>' +
-    '<div class="card"><h3>Evolução semanal de corrida (km)</h3>' + barChart(wr.vals, wr.labels) + '</div><div class="card"><h3>Evolução semanal de caminhada (km)</h3>' + barChart(ww.vals, ww.labels) + '</div>' +
-    '<button type="button" class="btn btn-ghost" data-action="nav" data-view="goals" style="margin-bottom:10px">Metas mensais</button><button type="button" class="btn btn-ghost" data-action="nav" data-view="edit" style="margin-bottom:10px">Editar perfil</button>' +
-    '<div class="card"><div class="switch"><span>Mensagens motivacionais</span><button type="button" class="' + (u.prefs.motivational ? 'on' : '') + '" data-action="toggle-motiv" aria-pressed="' + !!u.prefs.motivational + '" aria-label="Mensagens motivacionais"></button></div></div>' +
-    '<div class="card" style="border-color:#39FF69"><h3>A tua opinião conta</h3><p class="small muted" style="margin-bottom:10px">Ajuda-nos a melhorar a KORRE: diz-nos o que correu bem e o que podemos melhorar.</p><button type="button" class="btn btn-neon" data-action="feedback">ENVIAR FEEDBACK</button></div>' +
-    '<button type="button" class="btn btn-ghost" data-action="bell" style="margin-bottom:10px">Notificações' + (unread() ? ' (' + unread() + ')' : '') + '</button><button type="button" class="btn btn-ghost" data-action="nav" data-view="terms" style="margin-bottom:10px">Termos e privacidade</button>' +
-    '<button type="button" class="btn btn-dark" data-action="logout" style="margin-bottom:10px">Sair da conta</button><button type="button" class="btn btn-danger" data-action="delete-account">APAGAR CONTA E DADOS</button>' +
-    '<p class="small muted center" style="margin-top:10px">KORRE · ' + APP_VERSION + '</p>';
+  function nav(label, view) { return '<button type="button" class="li" data-action="nav" data-view="' + view + '"><span>' + label + '</span><span class="chev">›</span></button>'; }
+  function act(label, a, cls) { return '<button type="button" class="li' + (cls ? ' ' + cls : '') + '" data-action="' + a + '"><span>' + label + '</span>' + (cls ? '' : '<span class="chev">›</span>') + '</button>'; }
+  function toggle(label, sub, a, on) { return '<div class="li"><span>' + label + (sub ? '<br><span class="small muted">' + sub + '</span>' : '') + '</span><span class="switch" style="min-height:0"><button type="button" class="' + (on ? 'on' : '') + '" data-action="' + a + '" aria-pressed="' + !!on + '" aria-label="' + label + '"></button></span></div>'; }
+  $('view').innerHTML = '<div class="row" style="align-items:center;gap:16px;margin:4px 0 6px"><div class="avatar" style="background:' + esc(u.avatar) + ';flex:none">' + esc(u.name.charAt(0).toUpperCase()) + '</div><div><h2 style="margin:0">' + esc(u.name) + '</h2><div class="small muted">' + esc(u.athleteId) + ' · ' + esc(u.province) + '</div><div class="small muted">Desde ' + new Date(u.createdAt).toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' }) + '</div></div></div>' +
+    '<div class="stats"><div class="metric"><b>' + fmtKm1(st.run.km) + '</b><span>Km corrida</span></div><div class="metric"><b>' + fmtKm1(st.walk.km) + '</b><span>Km caminhada</span></div><div class="metric"><b>' + (st.run.count + st.walk.count) + '</b><span>Actividades</span></div></div>' +
+    '<div class="li" style="min-height:48px"><span class="muted">Posição no ranking</span><b style="font-family:var(--fh);font-size:22px">' + (u.showInRanking && state.myPos ? state.myPos.pos + '.º' : '—') + '</b></div>' +
+    '<div class="li" style="min-height:48px"><span class="muted">Metas mensais</span><span>' + u.goals.run + ' · ' + u.goals.walk + ' km</span></div>' +
+    '<div class="li" style="min-height:48px"><span class="muted">Sexo</span><span>' + sexL + (u.sexPublic === false ? ' (não público)' : '') + '</span></div>' +
+    (st.review.count || st.rejected || st.pending.count ? '<p class="small muted" style="padding:10px 2px">Fora dos totais válidos: ' + (st.pending.count ? st.pending.count + ' por validar · ' : '') + (st.review.count ? st.review.count + ' sob análise (' + fmtKm1(st.review.km) + ' km) · ' : '') + (st.rejected ? st.rejected + ' rejeitada(s)' : '') + '</p>' : '') +
+    '<div class="sect">Evolução semanal · corrida (km)</div>' + barChart(wr.vals, wr.labels) + '<div class="sect">Evolução semanal · caminhada (km)</div>' + barChart(ww.vals, ww.labels) +
+    '<div class="sect">Preferências</div>' + toggle('Aparecer no ranking', 'Mostramos só o nome de ranking e os km válidos de corrida', 'toggle-ranking', u.showInRanking) + toggle('Mensagens motivacionais', '', 'toggle-motiv', u.prefs.motivational) +
+    '<div class="sect">Conta</div>' + nav('Editar perfil', 'edit') + nav('Metas mensais', 'goals') + act('Notificações' + (unread() ? ' (' + unread() + ')' : ''), 'bell') + act('Enviar feedback', 'feedback') + nav('Termos e privacidade', 'terms') +
+    act('Sair da conta', 'logout', 'x') + act('Apagar conta e dados', 'delete-account', 'danger') + '<p class="small muted center" style="margin-top:18px">KORRE · ' + APP_VERSION + '</p>';
 };
 VIEWS.edit = function () {
   var u = state.user, prov = PROVINCES.map(function (p) { return '<option' + (p === u.province ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join(''), cols = ['#39FF69', '#19C75A', '#B8FF8A', '#7DF9C2', '#F5F7F5'];
