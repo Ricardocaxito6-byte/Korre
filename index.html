@@ -309,7 +309,7 @@ function trimRoute(coords, maxM, frac) {
 var TERMS = [
   ['Sobre a KORRE', 'A KORRE é uma aplicação de corrida e caminhada. Regista as tuas actividades com o GPS do telemóvel, mostra a tua evolução e permite comparares-te no ranking.'],
   ['Dados pessoais', 'Guardamos o teu nome, e-mail, província, sexo (para as classificações), metas e as tuas actividades, incluindo o percurso GPS, num servidor seguro. A localização só é pedida quando inicias uma actividade. Não vendemos os teus dados.'],
-  ['Ranking', 'Só aparece no ranking quem o escolher, e apenas com o nome que definir. Só contam os quilómetros validados, de corrida e de caminhada. Podes sair do ranking quando quiseres, no Perfil.'],
+  ['Ranking', 'Só aparece no ranking quem o escolher, e apenas com o nome que definir. Só os quilómetros de corrida validados contam. A caminhada nunca entra no ranking. Podes sair do ranking quando quiseres, no Perfil.'],
   ['Validação das actividades', 'O servidor verifica cada actividade e pode marcá-la como sob análise ou rejeitá-la quando os dados do GPS não forem compatíveis com a modalidade. Não é possível editar distâncias.'],
   ['Apagar a conta', 'Podes apagar a tua conta e todos os teus dados no Perfil. É definitivo.'],
   ['Alterações', 'Este texto é um rascunho informativo. Deve ser revisto por um jurista e substituído pelos termos e pela política de privacidade oficiais antes do lançamento público.']
@@ -675,7 +675,7 @@ VIEWS.home = function () {
   var u = state.user, ref = new Date(), st = computeStats(state.acts, ref), n = unread(), r = state.run, live = r.status === 'running' || r.status === 'paused' || r.status === 'finished';
   var recent = state.acts.slice().sort(function (a, b) { return b.startTime - a.startTime; }).slice(0, 3), pend = state.acts.filter(function (a) { return !a.synced && !a.localOnly; }).length;
   function goalRow(m) { var g = goalProgress(state.acts, u.goals[m], m, ref); return '<div class="goal"><div class="gl"><span>' + MODES[m] + '</span><span><b>' + fmtKm1(g.km) + '</b> <span class="muted">/ ' + g.goal + ' km</span></span></div><div class="bar"><i style="width:' + g.pct + '%"></i></div><div class="small muted">' + (g.reached ? 'Meta atingida' : 'Faltam ' + fmtKm1(g.remaining) + ' km · ' + g.pct + '%') + '</div></div>'; }
-  var rankTxt = !u.showInRanking ? 'Ainda não estás no ranking' : state.myPos ? '<b style="font-family:var(--fh);font-size:24px">' + state.myPos.pos + '.º</b> <span class="muted">· ' + fmtKm1(state.myPos.km) + ' km válidos</span>' : 'Faz a tua primeira actividade válida';
+  var rankTxt = !u.showInRanking ? 'Ainda não estás no ranking' : state.myPos ? '<b style="font-family:var(--fh);font-size:24px">' + state.myPos.pos + '.º</b> <span class="muted">· ' + fmtKm1(state.myPos.km) + ' km válidos de corrida</span>' : 'Faz a tua primeira corrida válida';
   $('view').innerHTML = '<div class="top"><div class="who">' + logoImg(38) + '<span class="wordmark">KORRE</span></div><button type="button" class="iconbtn" data-action="bell" aria-label="Notificações">' + icon('bell', 22) + (n ? '<span class="dotbadge">' + n + '</span>' : '') + '</button></div>' +
     '<p class="muted" style="margin:0 0 20px">Olá, <b style="color:var(--text);font-weight:600">' + esc(u.name) + '</b></p>' +
     (pend ? '<div class="li" style="color:var(--amber);min-height:48px"><span class="small">' + pend + ' actividade(s) por validar</span><button type="button" class="btn-link" data-action="sync-now" style="color:var(--amber)">Sincronizar</button></div>' : '') +
@@ -718,7 +718,7 @@ VIEWS.choose = function () {
   var c = state.choice;
   function card(m, t, lines) { return '<button type="button" class="mode' + (c.mode === m ? ' on' : '') + '" data-action="pick-mode" data-m="' + m + '"><span class="mi">' + icon(m, 28) + '</span><span><b style="font-size:20px">' + t + '</b><br><span class="small muted">' + lines + '</span></span></button>'; }
   $('view').innerHTML = back('Voltar', 'home') + '<h1 style="margin:8px 0 14px">Que actividade vais fazer?</h1>' +
-    card('run', 'CORRIDA', 'Ritmo e distância. Os quilómetros válidos contam para o ranking.') + card('walk', 'CAMINHADA', 'Os quilómetros válidos também contam para o ranking.') +
+    card('run', 'CORRIDA', 'Regista a actividade; os quilómetros válidos contam para o ranking.') + card('walk', 'CAMINHADA', 'Acompanhamento pessoal. Não conta para o ranking.') +
     '<p class="small muted" style="margin:10px 0 14px">A localização só é pedida ao confirmar e serve apenas para medir o teu percurso.</p><button type="button" class="btn btn-primary btn-xl" data-action="confirm-start">CONFIRMAR E INICIAR</button>';
 };
 VIEWS.active = function () {
@@ -782,7 +782,7 @@ async function summaryView() {
   $('view').innerHTML = '<div class="top"><h1>Resumo</h1></div><div class="between" style="margin-bottom:8px"><b>' + MODES[a.mode] + '</b><span class="small muted">' + fmtDate(a.startTime) + '</span></div>' +
     '<div id="map-sum" class="map"></div><p class="small muted" style="margin-bottom:12px">Percurso gravado pelo GPS.</p><div class="card center"><div class="big">' + fmtKm(a.distanceKm) + '<small>km</small></div></div>' +
     '<div class="row" style="margin-bottom:14px"><div class="metric"><b>' + fmtDur(a.durationSeconds) + '</b><span>Tempo</span></div><div class="metric"><b>' + fmtPace(paceOf(a)) + '</b><span>min/km</span></div><div class="metric"><b>' + fmtKmh(a.averageSpeed) + '</b><span>km/h</span></div></div>' +
-    '<div class="card"><h3>Validação preliminar</h3><p>' + tag + '</p>' + (a.reasons.length ? '<ul class="rules" style="margin-top:8px">' + a.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="small muted">Sem anomalias. A validação final é feita pelo servidor ao guardares.' + ' Se for válida, os quilómetros contam para o ranking.' + '</p>') + '</div>' +
+    '<div class="card"><h3>Validação preliminar</h3><p>' + tag + '</p>' + (a.reasons.length ? '<ul class="rules" style="margin-top:8px">' + a.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="small muted">Sem anomalias. A validação final é feita pelo servidor ao guardares.' + (a.mode === 'run' ? ' Se for válida, os quilómetros contam para o ranking.' : ' A caminhada é de acompanhamento pessoal.') + '</p>') + '</div>' +
     (a.canSave ? '<button type="button" id="save-btn" class="btn btn-primary" data-action="save">GUARDAR ACTIVIDADE</button><button type="button" class="btn btn-ghost" data-action="share" data-draft="1" style="margin-top:10px">PARTILHAR</button>' : '') + '<button type="button" class="btn btn-danger" data-action="discard" style="margin-top:10px">DESCARTAR</button>';
   mountMap('map-sum', a.coordinates, true);
 }
@@ -802,8 +802,8 @@ async function discardRun() { if (!(await askConfirm('Descartar actividade?', 'O
 VIEWS.ranking = function () {
   var u = state.user, tab = state.rankTab, tabs = [['national', 'Nacional'], ['M', 'Masculino'], ['F', 'Feminino'], ['province', 'Província']].map(function (t) { return '<button type="button" class="chip' + (tab === t[0] ? ' on' : '') + '" data-action="rank-tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('');
   var prov = tab === 'province' ? '<select id="rank-prov" aria-label="Província" style="margin-bottom:10px">' + PROVINCES.map(function (p) { return '<option' + (p === state.rankProv ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join('') + '</select>' : '';
-  var optin = !u.showInRanking ? '<div class="card" style="border-color:#34B36B"><h3>Entrar no ranking</h3><p class="small muted" style="margin-bottom:10px">Só aparece quem escolher. Mostramos apenas o nome que definires e os teus quilómetros válidos.</p><button type="button" class="btn btn-primary" data-action="join-ranking">ENTRAR NO RANKING</button></div>' : '';
-  $('view').innerHTML = '<h1>Ranking</h1><p class="muted small" style="margin:4px 0 10px">Total de quilómetros válidos, de corrida e de caminhada.</p>' + optin + '<div class="chips">' + tabs + '</div>' + prov + '<div id="rank-note"></div><div class="card" id="rank-body"><p class="muted center">A carregar…</p></div><button type="button" class="btn btn-dark" data-action="rank-refresh">Actualizar</button>';
+  var optin = !u.showInRanking ? '<div class="card" style="border-color:#34B36B"><h3>Entrar no ranking</h3><p class="small muted" style="margin-bottom:10px">Só aparece quem escolher. Mostramos apenas o nome que definires e os teus quilómetros válidos de corrida.</p><button type="button" class="btn btn-primary" data-action="join-ranking">ENTRAR NO RANKING</button></div>' : '';
+  $('view').innerHTML = '<h1>Ranking</h1><p class="muted small" style="margin:4px 0 10px">Total de quilómetros válidos de corrida. A caminhada não conta.</p>' + optin + '<div class="chips">' + tabs + '</div>' + prov + '<div id="rank-note"></div><div class="card" id="rank-body"><p class="muted center">A carregar…</p></div><button type="button" class="btn btn-dark" data-action="rank-refresh">Actualizar</button>';
   loadRanking();
 };
 async function loadRanking() {
@@ -822,7 +822,7 @@ async function loadRanking() {
       var pos = Number(r.rank_pos); if (r.is_me && pos > lastPos + 1 && lastPos > 0) html += '<div class="center muted" style="padding:6px">···</div>'; lastPos = pos;
       html += '<div class="rank' + (r.is_me ? ' me' : '') + '"><span class="pos">' + pos + '.º</span><span class="nm"><b>' + esc(r.display) + (r.is_me ? ' (tu)' : '') + '</b><br><span class="small muted">' + esc(r.province_name) + '</span></span><span class="km">' + fmtKm1(Number(r.total_km)) + ' km</span></div>';
     });
-    $('rank-body').innerHTML = html || '<p class="muted center">Ainda ninguém no ranking. Faz uma actividade válida e sê o primeiro!</p>';
+    $('rank-body').innerHTML = html || '<p class="muted center">Ainda ninguém no ranking. Faz uma corrida válida e sê o primeiro!</p>';
   } catch (e) {
     if (token !== state.rankReq || state.view !== 'ranking') return;
     $('rank-body').innerHTML = '<p class="muted center">' + esc(apiMessage(e)) + '</p>';
@@ -854,7 +854,7 @@ VIEWS.profile = function () {
     '<div class="li" style="min-height:48px"><span class="muted">Sexo</span><span>' + sexL + (u.sexPublic === false ? ' (não público)' : '') + '</span></div>' +
     (st.review.count || st.rejected || st.pending.count ? '<p class="small muted" style="padding:10px 2px">Fora dos totais válidos: ' + (st.pending.count ? st.pending.count + ' por validar · ' : '') + (st.review.count ? st.review.count + ' sob análise (' + fmtKm1(st.review.km) + ' km) · ' : '') + (st.rejected ? st.rejected + ' rejeitada(s)' : '') + '</p>' : '') +
     '<div class="sect">Evolução semanal · corrida (km)</div>' + barChart(wr.vals, wr.labels) + '<div class="sect">Evolução semanal · caminhada (km)</div>' + barChart(ww.vals, ww.labels) +
-    '<div class="sect">Preferências</div>' + toggle('Aparecer no ranking', 'Mostramos só o nome de ranking e os km válidos', 'toggle-ranking', u.showInRanking) + toggle('Mensagens motivacionais', '', 'toggle-motiv', u.prefs.motivational) +
+    '<div class="sect">Preferências</div>' + toggle('Aparecer no ranking', 'Mostramos só o nome de ranking e os km válidos de corrida', 'toggle-ranking', u.showInRanking) + toggle('Mensagens motivacionais', '', 'toggle-motiv', u.prefs.motivational) +
     '<div class="sect">Conta</div>' + nav('Editar perfil', 'edit') + nav('Metas mensais', 'goals') + act('Notificações' + (unread() ? ' (' + unread() + ')' : ''), 'bell') + act('Enviar feedback', 'feedback') + nav('Termos e privacidade', 'terms') +
     act('Sair da conta', 'logout', 'x') + act('Apagar conta e dados', 'delete-account', 'danger') + '<p class="small muted center" style="margin-top:18px">KORRE · ' + APP_VERSION + '</p>';
 };
